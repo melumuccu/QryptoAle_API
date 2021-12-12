@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js';
 import Binance, { AssetBalance } from 'binance-api-node';
 import { environment } from '../environments/environment';
+import { UtilService } from '../shared/util.service';
 
 export class BinanceApi {
   private binance = Binance({
@@ -16,6 +17,10 @@ export class BinanceApi {
    * @returns 全通貨の現在保有額
    */
   async getAllBalances(minQuantity: number, includeLocked: boolean) {
+    if (UtilService.containsNullable(minQuantity, includeLocked)) {
+      throw Error('いずれかのクエリパラメータがnullable');
+    }
+
     const accountInfo = await this.binance.accountInfo();
     const balances = accountInfo.balances;
 

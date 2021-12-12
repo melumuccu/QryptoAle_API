@@ -21,3 +21,10 @@
   - 全通貨の現在保有額を取得
   - 返す型
     - AssetBalance[] (binance-api-node)
+  - クエリパラメータ
+    - minQuantity: number
+      - 通貨の最小数量
+      - default: 0
+    - includeLocked: boolean
+      - ロックされている(=注文中の)数量を含めるか
+      - default: true

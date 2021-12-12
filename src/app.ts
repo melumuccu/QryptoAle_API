@@ -20,9 +20,27 @@ app.listen(3000, () => {
   console.log('Start on port 3000.');
 });
 
+/**
+ * 全通貨の現在保有額をresponseする
+ *
+ * クエリパラメータ
+ * ・minQuantity: number
+ *     ・通貨の最小数量
+ *     ・default: 0
+ * ・includeLocked: boolean
+ *     ・ロックされている(=注文中の)数量を含めるか
+ *     ・default: true
+ */
 app.get('/balances', async (req: express.Request, res: express.Response) => {
   console.log('***** START-/balances *****');
-  const allBalances = await binanceApi.getAllBalances(0, true).catch(error => console.error(error));
+  // クエリパラメータのチェック
+  const minQuantity = req.query.minQuantity ? Number(req.query.minQuantity) : 0;
+  const includeLocked = req.query.includeLocked ? Boolean(req.query.includeLocked) : true;
+  console.log('クエリパラメータ(デフォルト値適用済み): ', minQuantity, includeLocked);
+
+  const allBalances = await binanceApi
+    .getAllBalances(minQuantity, includeLocked)
+    .catch(error => console.error(error));
   console.log('file: app.ts => line 26 => app.get => allBalances', allBalances);
   console.log('***** END-/balances *****');
   res.send(allBalances);
