@@ -20,9 +20,10 @@ app.listen(3000, () => {
   console.log('Start on port 3000.');
 });
 
-// TODO test
-app.get('/', async (req: express.Request, res: express.Response) => {
+app.get('/balances', async (req: express.Request, res: express.Response) => {
+  console.log('***** START-/balances *****');
   const allBalances = await binanceApi.getAllBalances(true).catch(error => console.error(error));
   console.log('file: app.ts => line 26 => app.get => allBalances', allBalances);
+  console.log('***** END-/balances *****');
   res.send(allBalances);
 });
