@@ -17,35 +17,37 @@ export class BinanceApi {
   /**
    * 全通貨の現在保有額を取得
    *
+   * @param minQuantity 最小数量
    * @param includeOnOrder 注文中の数量を含むか
-   * @param binance
    * @returns 全通貨の現在保有額
    */
-  getAllBalances(includeOnOrder: boolean): Promise<ProcessedBalance[]> {
+  getAllBalances(minQuantity: number, includeOnOrder: boolean): Promise<ProcessedBalance[]> {
     return new Promise(resolve => {
-      binance.balance(function (error: string, balances: Balance) {
-        // 対象数量が0でない仮想通貨名(ex. [BTC, ETH, ...])
-        const over0Cryptos = Object.keys(balances).filter(crypto => {
+      binance.balance((error: string, balances: Balance) => {
+        // 最小数量を超えた仮想通貨名を抽出(ex. [BTC, ETH, ...])
+        const cryptosOrMoreMinQuantity = Object.keys(balances).filter(crypto => {
           const availableB = new BigNumber(parseFloat(balances[crypto].available));
           const onOrderB = new BigNumber(parseFloat(balances[crypto].onOrder));
-          // 対象数量
+          // 対象とする数量
           const targetB = includeOnOrder ? availableB.plus(onOrderB) : availableB;
-          // 保有している通貨のみに限定
-          return targetB.toNumber() > 0;
+          // 最小数量以上の通貨のみにfilter
+          return targetB.toNumber() > minQuantity;
         });
-        console.log('対象数量が0でない仮想通貨: ', over0Cryptos);
+        console.log(
+          'file: binance.api.ts => line 36 => cryptosOrMoreMinQuantity => cryptosOrMoreMinQuantity',
+          cryptosOrMoreMinQuantity
+        );
 
-        const balanceOfOver0Cryptos: ProcessedBalance[] = [];
-        over0Cryptos.map(over0Crypto => {
-          const processed: ProcessedBalance = {
-            crypto: over0Crypto,
-            available: balances[over0Crypto].available,
-            onOrder: balances[over0Crypto].onOrder,
-          };
-          balanceOfOver0Cryptos.push(processed);
-        });
-
-        return resolve(balanceOfOver0Cryptos);
+        // memo: フロント側で扱いやすい形に変換している
+        return resolve(
+          cryptosOrMoreMinQuantity.map(crypto => {
+            return {
+              crypto,
+              available: balances[crypto].available,
+              onOrder: balances[crypto].onOrder,
+            };
+          })
+        );
       });
     });
   }
