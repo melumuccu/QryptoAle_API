@@ -1,7 +1,9 @@
 import express from 'express';
 import { BinanceApi } from './lib/binance.api';
+import { OtherApi } from './lib/other.api';
 
 const binanceApi = new BinanceApi();
+const otherApi = new OtherApi();
 
 const app: express.Express = express();
 app.use(express.json());
@@ -55,4 +57,31 @@ app.get('/rates', async (req: express.Request, res: express.Response) => {
   console.log('file: app.ts => line 55 => app.get => rates', rates);
   console.log('***** END-/rates *****');
   res.send(rates);
+});
+
+/**
+ * 指定ペアの変換レートを取得する
+ *
+ * クエリパラメータ
+ * convertFrom: string
+ *     ・変換前となる通貨
+ * convertTo: string
+ *     ・変換後となる通貨
+ */
+app.get('/rate', async (req: express.Request, res: express.Response) => {
+  console.log('***** START-/rate *****');
+  // クエリパラメータのチェック
+  const convertFrom = req.query.convertFrom || undefined;
+  const convertTo = req.query.convertTo || undefined;
+  console.log('クエリパラメータ: convertFrom=', convertFrom, ' convertTo=', convertTo);
+
+  // TODO 各種通貨のUSDT変換に対応
+  const rate = await otherApi.fetchRateOfUsdToJpy();
+  // convertFrom === 'USD' && convertTo === 'JPY'
+  //   ? await binanceApi.fetchRateOfUsdToJpy().catch(error => console.error(error))
+  //   : false;
+  console.log('file: app.ts => line 78 => app.get => rate', rate);
+  console.log('***** END-/rate *****');
+  res.sendStatus(Number(rate));
+  // TODO なんかエラーになる... レートの取得はできているのにアプリ側でレスポンスがエラー。定数をこちらから返した場合は問題なし
 });
