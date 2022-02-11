@@ -2,7 +2,6 @@ import BigNumber from 'bignumber.js';
 import Binance, { AssetBalance } from 'binance-api-node';
 import { environment } from '../environments/environment';
 import { UtilService } from '../shared/util.service';
-
 export class BinanceApi {
   private binance = Binance({
     apiKey: environment.API_KEY,
@@ -35,5 +34,15 @@ export class BinanceApi {
     };
 
     return balances.filter(orMoreMinQuantity);
+  }
+
+  /**
+   * シンボルの現在レートを取得する
+   *
+   * @returns 現在の価格
+   */
+  async fetchNowSymbolPrice() {
+    // FIXME シンボルの指定で絞り込みができる
+    return this.binance.prices();
   }
 }

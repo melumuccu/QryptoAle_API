@@ -36,7 +36,7 @@ app.get('/balances', async (req: express.Request, res: express.Response) => {
   // クエリパラメータのチェック
   const minQuantity = req.query.minQuantity ? Number(req.query.minQuantity) : 0;
   const includeLocked = req.query.includeLocked ? Boolean(req.query.includeLocked) : true;
-  console.log('クエリパラメータ(デフォルト値適用済み): ', minQuantity, includeLocked);
+  console.log('クエリパラメータ: minQuantity=', minQuantity, ' includeLocked=', includeLocked);
 
   const allBalances = await binanceApi
     .getAllBalances(minQuantity, includeLocked)
@@ -44,4 +44,15 @@ app.get('/balances', async (req: express.Request, res: express.Response) => {
   console.log('file: app.ts => line 26 => app.get => allBalances', allBalances);
   console.log('***** END-/balances *****');
   res.send(allBalances);
+});
+
+/**
+ * 全てのシンボルの現在レートを取得する
+ */
+app.get('/rates', async (req: express.Request, res: express.Response) => {
+  console.log('***** START-/rates *****');
+  const rates = await binanceApi.fetchNowSymbolPrice();
+  console.log('file: app.ts => line 55 => app.get => rates', rates);
+  console.log('***** END-/rates *****');
+  res.send(rates);
 });
