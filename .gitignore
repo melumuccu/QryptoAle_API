@@ -71,3 +71,4 @@ typings/
 /dist
 
 # その他
+src/lambda/*.js
